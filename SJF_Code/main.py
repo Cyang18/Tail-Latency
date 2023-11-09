@@ -1,4 +1,7 @@
 from mininet.topo import Topo
+from mininet.net import Mininet
+from mininet.node import Host, OVSKernelSwitch
+from mininet.link import TCLink
 
 class MyTopo( Topo ):
 
@@ -17,7 +20,11 @@ class MyTopo( Topo ):
 
 def run_sjf():
     topo = MyTopo()
+    net = Mininet(topo=topo, host=Host, switch=OVSKernelSwitch, link=TCLink)
+    net.start()
+    net.stop()
 
+    h1, h2, h3 = net.get('h1', 'h2', 'h3')
 if __name__ == '__main__':
     run_sjf()
 
