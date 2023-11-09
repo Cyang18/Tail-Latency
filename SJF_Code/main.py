@@ -15,6 +15,9 @@ class MyTopo( Topo ):
         self.addLink(h2, s1)
         self.addLink(h3, s1)
 
+def run_sjf():
+    topo = MyTopo()
 
+if __name__ == '__main__':
+    run_sjf()
 
-topos = { 'mytopo': ( lambda: MyTopo() ) }
