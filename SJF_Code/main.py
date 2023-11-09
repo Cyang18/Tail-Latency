@@ -23,6 +23,11 @@ def run_sjf():
     net = Mininet(topo=topo, host=Host, switch=OVSKernelSwitch, link=TCLink)
     net.start()
     h1, h2, h3 = net.get('h1', 'h2', 'h3')
+
+    h1.cmd('echo "Job 1 started"')
+    h2.cmd('echo "Job 2 started"')
+    h3.cmd('echo "Job 3 started"')
+    
     net.stop()
 
 if __name__ == '__main__':
