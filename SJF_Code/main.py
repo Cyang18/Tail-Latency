@@ -1,30 +1,62 @@
-#Version 0.1: This is prototype that simulates the shortest job first.
-def shortest_job_first(packages):
-    current_time = 0
-    schedule = []
+from mininet.topo import Topo
+from mininet.net import Mininet
+from mininet.node import Host, OVSKernelSwitch
+from mininet.link import TCLink
+import time
+import random
 
-    # Sort the jobs by burst time (the time required to complete each job)
-    # Assuming (job_id, burst_time)
-    packages.sort(key=lambda x: x[1])
+class MyTopo( Topo ):
 
-    #iterate through the array
-    for job_id, burst_time in packages:
+    # Sets up the topology: Single - Topology
+    # With N host, and 1 switch
+    def build(self, num_hosts):
+        #  Loop throught the for loop and then self define
+        #  the then link each host to the switch using the for loop
+        s1 = self.addSwitch('s1')
+        for i in range(1, num_hosts + 1):
+            host = self.addHost('h{}'.format(i))
+            self.addLink(host, s1)
 
-        # re-schedule the schedule after being sorted
-        schedule.append((job_id, current_time))
+    #  This is the algorthim for the sjf,
+    #  So i created a list of jobs, and assign a rand. excution time for each host
+    #  then it gets sorted, so that the shortest excution time gets sorted first for the host
+    #  Basically shortest excution time, then the host with that packet gets sent first
+def sjf_scheduling(hosts):
+    jobs = [(host, random.randint(1, 100)) for host in hosts] 
+    jobs.sort(key=lambda x: x[1])
+    return [job[0] for job in jobs]
 
-        # Update the current time and subtract the job's burst time
-        # Gets the time frame of when each package is gonna be sent
-        current_time += burst_time
+    # Sets up the topology, hots, switch, and links
+    # then it simulates the packets being sent to out
+    # and gets the excution time and end time 
+def run_sjf(num_hosts):
+    topo = MyTopo(num_hosts=num_hosts)
+    net = Mininet(topo=topo, host=Host, switch=OVSKernelSwitch, link=TCLink)
+    net.start()
 
-    return schedule
+    #  Store the list of host into a host_list
+    host_list = [net.get('h{}'.format(i)) for i in range(1, num_hosts + 1)]
 
+    #  Loops through the list and inform us that the host has started
+    for host in host_list:
+        host.cmd("Job {} started".format(host.name))
 
- # List of jobs, each represented as (job_id, burst_time)
-packages = [(1, 6), (4, 3), (5, 2)]
-schedule = shortest_job_first(packages)
+    #  Calls the function, sorts the excution 
+    ordered_jobs = sjf_scheduling(host_list)
 
-print("Schedule of each Job being processed (Job ID, Start Time):")
-for job_id, start_time in schedule:
-    print(f"Job_ID {job_id}: Wait time {start_time}")
+    #  So this for loop runs through the list of jobs from the function
+    #  Then it keeps track of the excution time and end time
+    #  Using that we can get the time it was excuted and recieved to get the latency
+    for job in ordered_jobs:
+        start_time = time.time()
+        job.cmd("Executing {}".format(job.name))
+        end_time = time.time()
+        execution_time = end_time - start_time
+        job.cmd("Job completed on {}".format(job.name))
+        print("Execution time for {} is {} seconds".format(job.name, execution_time))
+    net.stop()
+
+if __name__ == '__main__':
+    num_hosts = 5  
+    run_sjf(num_hosts)
 
