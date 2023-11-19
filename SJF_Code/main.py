@@ -51,9 +51,9 @@ def run_sjf(num_hosts):
         start_time = time.time()
         job.cmd("Executing {}".format(job.name))
         end_time = time.time()
-        execution_time = end_time - start_time
+        execution_time = (end_time - start_time) * 1000
         job.cmd("Job completed on {}".format(job.name))
-        print("Execution time for {} is {} seconds".format(job.name, execution_time))
+        print("Execution time {} ms".format(execution_time))
     net.stop()
 
 if __name__ == '__main__':
