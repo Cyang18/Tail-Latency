@@ -43,7 +43,7 @@ def run_sjf(num_hosts):
 
     #  Calls the function, sorts the excution 
     ordered_jobs = sjf_scheduling(host_list)
-
+    net.pingAll()
     #  So this for loop runs through the list of jobs from the function
     #  Then it keeps track of the excution time and end time
     #  Using that we can get the time it was excuted and recieved to get the latency
@@ -51,9 +51,9 @@ def run_sjf(num_hosts):
         start_time = time.time()
         job.cmd("Executing {}".format(job.name))
         end_time = time.time()
-        execution_time = end_time - start_time
+        execution_time = (end_time - start_time) * 1000
         job.cmd("Job completed on {}".format(job.name))
-        print("Execution time for {} is {} seconds".format(job.name, execution_time))
+        print("Execution time for {} is {} ms".format(job.name, execution_time))
     net.stop()
 
 if __name__ == '__main__':
